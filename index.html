@@ -2,10 +2,71 @@
 <html>
 <head>
   <title>Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f3ec;
+      color: #202124;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 18px;
+    }
+
+    h1 {
+      margin: 0 0 22px;
+      color: #17633a;
+      font-size: 32px;
+      text-align: center;
+    }
+
+    #menu {
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border: 1px solid #e1d8ca;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(32, 33, 36, 0.08);
+    }
+
+    .item-name {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .item-price {
+      font-size: 20px;
+      font-weight: 700;
+      color: #b64b20;
+      white-space: nowrap;
+    }
+
+    .message {
+      padding: 16px;
+      border-radius: 8px;
+      background: #ffffff;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <h1>My Shop Menu</h1>
-  <div id="menu"></div>
+  <main>
+    <h1>GFM Menu</h1>
+    <div id="menu" class="message">Loading menu...</div>
+  </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -23,20 +84,37 @@
     const menuDiv = document.getElementById("menu");
 
     async function loadMenu() {
-      const querySnapshot = await getDocs(collection(db, "items"));
-      
-      querySnapshot.forEach((doc) => {
-        const item = doc.data();
+      try {
+        const querySnapshot = await getDocs(collection(db, "items"));
+        menuDiv.classList.remove("message");
+        menuDiv.innerHTML = "";
 
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <h3>${item.name}</h3>
-          <p>Price: ₹${item.price}</p>
-          <hr/>
-        `;
+        if (querySnapshot.empty) {
+          menuDiv.classList.add("message");
+          menuDiv.textContent = "No menu items found.";
+          return;
+        }
 
-        menuDiv.appendChild(div);
-      });
+        querySnapshot.forEach((doc) => {
+          const item = doc.data();
+          const menu = item.Menu || {};
+          const name = menu.gota || item.gota || item.name || "Unnamed item";
+          const price = menu.Price ?? item.Price ?? item.price ?? "N/A";
+
+          const div = document.createElement("div");
+          div.className = "menu-item";
+          div.innerHTML = `
+            <p class="item-name">${name}</p>
+            <span class="item-price">Rs. ${price}</span>
+          `;
+
+          menuDiv.appendChild(div);
+        });
+      } catch (error) {
+        console.error("Error loading menu:", error);
+        menuDiv.classList.add("message");
+        menuDiv.textContent = "Could not load menu. Please check Firestore rules and collection name.";
+      }
     }
 
     loadMenu();
