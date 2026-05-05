@@ -4,48 +4,278 @@
   <title>Menu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --green-900: #053f23;
+      --green-800: #07642f;
+      --green-700: #09853d;
+      --green-100: #e7f5df;
+      --gold: #f4c95d;
+      --cream: #fffaf0;
+      --ink: #162116;
+      --muted: #67756a;
+      --line: rgba(10, 82, 39, 0.14);
+      --shadow: 0 18px 48px rgba(3, 37, 20, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: #f7f3ec;
-      color: #202124;
+      background:
+        radial-gradient(circle at 10% 8%, rgba(244, 201, 93, 0.26), transparent 28%),
+        radial-gradient(circle at 94% 18%, rgba(9, 133, 61, 0.26), transparent 28%),
+        linear-gradient(135deg, #fbf3dd 0%, #e7f5df 42%, #fffaf0 100%);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(5, 63, 35, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(5, 63, 35, 0.045) 1px, transparent 1px);
+      background-size: 34px 34px;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: min(78vw, 620px);
+      aspect-ratio: 1;
+      right: max(-180px, -18vw);
+      top: 72px;
+      background: url("assets/gfm-logo.jpg") center / cover no-repeat;
+      border-radius: 50%;
+      opacity: 0.08;
+      filter: saturate(1.1);
+      pointer-events: none;
     }
 
     main {
-      max-width: 720px;
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
       margin: 0 auto;
-      padding: 32px 18px;
+      padding: 24px 18px 42px;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 300px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 20px;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(5, 63, 35, 0.94), rgba(9, 133, 61, 0.86)),
+        url("assets/gfm-logo.jpg") center / cover no-repeat;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 80% 18%, rgba(244, 201, 93, 0.34), transparent 26%),
+        linear-gradient(90deg, rgba(5, 63, 35, 0.96), rgba(5, 63, 35, 0.62) 58%, rgba(5, 63, 35, 0.2));
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .hero-content,
+    .hero-logo {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 32px;
+      height: 2px;
+      background: var(--gold);
     }
 
     h1 {
-      margin: 0 0 22px;
-      color: #17633a;
-      font-size: 32px;
+      max-width: 560px;
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(38px, 7vw, 74px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 520px;
+      margin: 18px 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      font-size: 14px;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-logo {
+      width: clamp(142px, 24vw, 240px);
+      aspect-ratio: 1;
+      border: 8px solid rgba(255, 255, 255, 0.86);
+      border-radius: 50%;
+      background: #0a6d35;
+      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.26);
+      object-fit: cover;
+    }
+
+    .section-bar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 28px 4px 16px;
+    }
+
+    .section-bar h2 {
+      margin: 0;
+      color: var(--green-900);
+      font-size: 28px;
+      line-height: 1.1;
+    }
+
+    .section-bar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .menu-count {
+      min-width: 92px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--green-900);
+      background: rgba(255, 255, 255, 0.78);
       text-align: center;
+      font-size: 14px;
+      font-weight: 800;
     }
 
     #menu {
       display: grid;
-      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .menu-item {
-      padding: 16px 18px;
-      border: 1px solid #e1d8ca;
+      position: relative;
+      min-height: 92px;
+      padding: 18px;
+      border: 1px solid rgba(10, 82, 39, 0.12);
       border-radius: 8px;
-      background: #ffffff;
-      box-shadow: 0 2px 8px rgba(32, 33, 36, 0.08);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 240, 0.9));
+      box-shadow: 0 10px 28px rgba(5, 63, 35, 0.1);
       cursor: pointer;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .menu-item::before {
+      content: "";
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      right: -24px;
+      top: -26px;
+      border-radius: 50%;
+      background: rgba(9, 133, 61, 0.11);
+    }
+
+    .menu-item::after {
+      content: "+";
+      position: absolute;
+      right: 15px;
+      bottom: 13px;
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      color: var(--green-800);
+      background: var(--green-100);
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 400;
     }
 
     .menu-item:hover,
     .menu-item.active {
-      border-color: #17633a;
-      box-shadow: 0 3px 12px rgba(23, 99, 58, 0.16);
+      transform: translateY(-2px);
+      border-color: rgba(9, 133, 61, 0.42);
+      box-shadow: 0 16px 34px rgba(5, 63, 35, 0.18);
+    }
+
+    .menu-item.active {
+      grid-column: 1 / -1;
+      background: #ffffff;
+    }
+
+    .menu-item.active::after {
+      content: "-";
+      padding-bottom: 3px;
     }
 
     .item-summary {
+      position: relative;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -54,27 +284,37 @@
 
     .item-name {
       margin: 0;
-      font-size: 22px;
+      color: var(--green-900);
+      font-size: 21px;
       font-weight: 700;
+      line-height: 1.2;
     }
 
     .item-price {
-      font-size: 20px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #fff2c8;
+      font-size: 17px;
       font-weight: 700;
-      color: #b64b20;
+      color: #8b4f00;
       white-space: nowrap;
     }
 
     .weight-panel {
       display: none;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid #eee4d7;
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(10, 82, 39, 0.1);
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f5fbf1, #fffaf0);
     }
 
     .menu-item.active .weight-panel {
       display: grid;
-      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .weight-panel label {
@@ -92,20 +332,21 @@
       width: 100%;
       box-sizing: border-box;
       padding: 12px 14px;
-      border: 1px solid #d5c9b8;
+      border: 1px solid rgba(10, 82, 39, 0.18);
       border-radius: 6px;
       font-size: 18px;
       outline: none;
+      background: rgba(255, 255, 255, 0.88);
     }
 
     .calc-input:focus {
-      border-color: #17633a;
-      box-shadow: 0 0 0 3px rgba(23, 99, 58, 0.12);
+      border-color: var(--green-700);
+      box-shadow: 0 0 0 4px rgba(9, 133, 61, 0.12);
     }
 
     .calculated-result {
       min-height: 24px;
-      color: #17633a;
+      color: var(--green-800);
       font-size: 18px;
       font-weight: 700;
     }
@@ -113,14 +354,104 @@
     .message {
       padding: 16px;
       border-radius: 8px;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.84);
       text-align: center;
+      border: 1px solid var(--line);
+      box-shadow: 0 10px 28px rgba(5, 63, 35, 0.08);
+    }
+
+    @media (max-width: 760px) {
+      main {
+        padding: 12px 12px 32px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding: 24px;
+      }
+
+      .hero::before {
+        background:
+          radial-gradient(circle at 78% 18%, rgba(244, 201, 93, 0.28), transparent 24%),
+          linear-gradient(180deg, rgba(5, 63, 35, 0.94), rgba(5, 63, 35, 0.72));
+      }
+
+      .hero-logo {
+        width: 138px;
+        justify-self: start;
+        order: -1;
+      }
+
+      .hero-copy {
+        font-size: 15px;
+      }
+
+      .section-bar {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      #menu,
+      .menu-item.active .weight-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .menu-count {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .hero {
+        padding: 20px;
+      }
+
+      .hero-actions {
+        gap: 8px;
+      }
+
+      .pill {
+        min-height: 36px;
+        padding: 0 11px;
+        font-size: 13px;
+      }
+
+      .item-summary {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .item-price {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
 <body>
   <main>
-    <h1>GFM Menu</h1>
+    <section class="hero" aria-label="GFM menu">
+      <div class="hero-content">
+        <p class="eyebrow">Gokul Farsan Mart</p>
+        <h1>Fresh Daily GFM Menu</h1>
+        <p class="hero-copy">Tap any item to calculate the exact grams or price instantly.</p>
+        <div class="hero-actions" aria-label="Menu highlights">
+          <span class="pill">Fresh stock</span>
+          <span class="pill">Quick weight calculator</span>
+          <span class="pill">Live menu</span>
+        </div>
+      </div>
+      <img class="hero-logo" src="assets/gfm-logo.jpg" alt="GFM logo" />
+    </section>
+
+    <section class="section-bar" aria-label="Available products">
+      <div>
+        <h2>Today&apos;s Items</h2>
+        <p>Choose a product and enter grams or rupees.</p>
+      </div>
+      <div id="menuCount" class="menu-count">Loading</div>
+    </section>
+
     <div id="menu" class="message">Loading menu...</div>
   </main>
 
@@ -138,6 +469,7 @@
     const db = getFirestore(app);
 
     const menuDiv = document.getElementById("menu");
+    const menuCount = document.getElementById("menuCount");
 
     function parsePrice(price) {
       const numericPrice = Number(String(price).replace(/[^0-9.]/g, ""));
@@ -287,6 +619,7 @@
     function renderMenu(snapshot) {
       menuDiv.classList.remove("message");
       menuDiv.innerHTML = "";
+      let itemCount = 0;
 
       snapshot.forEach((doc) => {
         const menuItems = doc.data();
@@ -294,13 +627,17 @@
         Object.entries(menuItems).forEach(([name, price]) => {
           if (price !== null && price !== undefined && price !== "") {
             addMenuItem(name, price);
+            itemCount += 1;
           }
         });
       });
 
+      menuCount.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"}`;
+
       if (!menuDiv.children.length) {
         menuDiv.classList.add("message");
         menuDiv.textContent = "No menu items found.";
+        menuCount.textContent = "0 items";
       }
     }
 
@@ -308,6 +645,7 @@
       console.error("Error loading menu:", error);
       menuDiv.classList.add("message");
       menuDiv.textContent = "Could not load menu. Please check Firestore rules and collection name.";
+      menuCount.textContent = "Offline";
     }
 
     onSnapshot(collectionGroup(db, "gokul"), renderMenu, showError);
