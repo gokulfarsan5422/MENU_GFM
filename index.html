@@ -30,15 +30,26 @@
     }
 
     .menu-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
       padding: 16px 18px;
       border: 1px solid #e1d8ca;
       border-radius: 8px;
       background: #ffffff;
       box-shadow: 0 2px 8px rgba(32, 33, 36, 0.08);
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .menu-item:hover,
+    .menu-item.active {
+      border-color: #17633a;
+      box-shadow: 0 3px 12px rgba(23, 99, 58, 0.16);
+    }
+
+    .item-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
 
     .item-name {
@@ -52,6 +63,46 @@
       font-weight: 700;
       color: #b64b20;
       white-space: nowrap;
+    }
+
+    .weight-panel {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #eee4d7;
+    }
+
+    .menu-item.active .weight-panel {
+      display: grid;
+      gap: 10px;
+    }
+
+    .weight-panel label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #4a4d50;
+    }
+
+    .weight-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border: 1px solid #d5c9b8;
+      border-radius: 6px;
+      font-size: 18px;
+      outline: none;
+    }
+
+    .weight-input:focus {
+      border-color: #17633a;
+      box-shadow: 0 0 0 3px rgba(23, 99, 58, 0.12);
+    }
+
+    .calculated-price {
+      min-height: 24px;
+      color: #17633a;
+      font-size: 18px;
+      font-weight: 700;
     }
 
     .message {
@@ -83,9 +134,38 @@
 
     const menuDiv = document.getElementById("menu");
 
+    function parsePrice(price) {
+      const numericPrice = Number(String(price).replace(/[^0-9.]/g, ""));
+      return Number.isFinite(numericPrice) ? numericPrice : 0;
+    }
+
+    function calculateWeightPrice(price, grams) {
+      return (price * grams) / 1000;
+    }
+
+    function formatRupees(price) {
+      return `Rs. ${price.toFixed(2)}`;
+    }
+
+    function openWeightPanel(item, input) {
+      document.querySelectorAll(".menu-item.active").forEach((activeItem) => {
+        if (activeItem !== item) {
+          activeItem.classList.remove("active");
+        }
+      });
+
+      item.classList.add("active");
+      input.focus();
+    }
+
     function addMenuItem(name, price) {
+      const numericPrice = parsePrice(price);
       const div = document.createElement("div");
       div.className = "menu-item";
+      div.tabIndex = 0;
+
+      const summary = document.createElement("div");
+      summary.className = "item-summary";
 
       const itemName = document.createElement("p");
       itemName.className = "item-name";
@@ -95,8 +175,54 @@
       itemPrice.className = "item-price";
       itemPrice.textContent = `Rs. ${price}`;
 
-      div.appendChild(itemName);
-      div.appendChild(itemPrice);
+      summary.appendChild(itemName);
+      summary.appendChild(itemPrice);
+
+      const weightPanel = document.createElement("div");
+      weightPanel.className = "weight-panel";
+
+      const label = document.createElement("label");
+      label.textContent = "Enter gm";
+
+      const input = document.createElement("input");
+      input.className = "weight-input";
+      input.type = "number";
+      input.min = "1";
+      input.step = "1";
+      input.inputMode = "decimal";
+      input.placeholder = "Example: 250";
+
+      const calculatedPrice = document.createElement("div");
+      calculatedPrice.className = "calculated-price";
+
+      input.addEventListener("input", () => {
+        const grams = Number(input.value);
+
+        if (!Number.isFinite(grams) || grams <= 0) {
+          calculatedPrice.textContent = "";
+          return;
+        }
+
+        calculatedPrice.textContent = `Price for ${grams} gm: ${formatRupees(calculateWeightPrice(numericPrice, grams))}`;
+      });
+
+      weightPanel.appendChild(label);
+      weightPanel.appendChild(input);
+      weightPanel.appendChild(calculatedPrice);
+
+      div.appendChild(summary);
+      div.appendChild(weightPanel);
+
+      div.addEventListener("click", () => {
+        openWeightPanel(div, input);
+      });
+
+      div.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openWeightPanel(div, input);
+        }
+      });
 
       menuDiv.appendChild(div);
     }
