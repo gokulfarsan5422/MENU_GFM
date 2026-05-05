@@ -83,7 +83,12 @@
       color: #4a4d50;
     }
 
-    .weight-input {
+    .calc-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .calc-input {
       width: 100%;
       box-sizing: border-box;
       padding: 12px 14px;
@@ -93,12 +98,12 @@
       outline: none;
     }
 
-    .weight-input:focus {
+    .calc-input:focus {
       border-color: #17633a;
       box-shadow: 0 0 0 3px rgba(23, 99, 58, 0.12);
     }
 
-    .calculated-price {
+    .calculated-result {
       min-height: 24px;
       color: #17633a;
       font-size: 18px;
@@ -143,8 +148,16 @@
       return (price * grams) / 1000;
     }
 
+    function calculateGrams(price, rupees) {
+      return (rupees * 1000) / price;
+    }
+
     function formatRupees(price) {
       return `Rs. ${price.toFixed(2)}`;
+    }
+
+    function formatGrams(grams) {
+      return `${grams.toFixed(0)} gm`;
     }
 
     function openWeightPanel(item, input) {
@@ -181,22 +194,28 @@
       const weightPanel = document.createElement("div");
       weightPanel.className = "weight-panel";
 
-      const label = document.createElement("label");
-      label.textContent = "Enter gm";
+      const gramField = document.createElement("div");
+      gramField.className = "calc-field";
 
-      const input = document.createElement("input");
-      input.className = "weight-input";
-      input.type = "number";
-      input.min = "1";
-      input.step = "1";
-      input.inputMode = "decimal";
-      input.placeholder = "Example: 250";
+      const gramLabel = document.createElement("label");
+      gramLabel.textContent = "Enter gm";
+
+      const gramInput = document.createElement("input");
+      gramInput.className = "calc-input";
+      gramInput.type = "number";
+      gramInput.min = "1";
+      gramInput.step = "1";
+      gramInput.inputMode = "decimal";
+      gramInput.placeholder = "Example: 250";
+      gramInput.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
 
       const calculatedPrice = document.createElement("div");
-      calculatedPrice.className = "calculated-price";
+      calculatedPrice.className = "calculated-result";
 
-      input.addEventListener("input", () => {
-        const grams = Number(input.value);
+      gramInput.addEventListener("input", () => {
+        const grams = Number(gramInput.value);
 
         if (!Number.isFinite(grams) || grams <= 0) {
           calculatedPrice.textContent = "";
@@ -206,21 +225,59 @@
         calculatedPrice.textContent = `Price for ${grams} gm: ${formatRupees(calculateWeightPrice(numericPrice, grams))}`;
       });
 
-      weightPanel.appendChild(label);
-      weightPanel.appendChild(input);
-      weightPanel.appendChild(calculatedPrice);
+      gramField.appendChild(gramLabel);
+      gramField.appendChild(gramInput);
+      gramField.appendChild(calculatedPrice);
+
+      const priceField = document.createElement("div");
+      priceField.className = "calc-field";
+
+      const priceLabel = document.createElement("label");
+      priceLabel.textContent = "Enter price";
+
+      const priceInput = document.createElement("input");
+      priceInput.className = "calc-input";
+      priceInput.type = "number";
+      priceInput.min = "1";
+      priceInput.step = "1";
+      priceInput.inputMode = "decimal";
+      priceInput.placeholder = "Example: 100";
+      priceInput.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+
+      const calculatedGrams = document.createElement("div");
+      calculatedGrams.className = "calculated-result";
+
+      priceInput.addEventListener("input", () => {
+        const rupees = Number(priceInput.value);
+
+        if (!Number.isFinite(rupees) || rupees <= 0 || numericPrice <= 0) {
+          calculatedGrams.textContent = "";
+          return;
+        }
+
+        calculatedGrams.textContent = `Gram for ${formatRupees(rupees)}: ${formatGrams(calculateGrams(numericPrice, rupees))}`;
+      });
+
+      priceField.appendChild(priceLabel);
+      priceField.appendChild(priceInput);
+      priceField.appendChild(calculatedGrams);
+
+      weightPanel.appendChild(gramField);
+      weightPanel.appendChild(priceField);
 
       div.appendChild(summary);
       div.appendChild(weightPanel);
 
       div.addEventListener("click", () => {
-        openWeightPanel(div, input);
+        openWeightPanel(div, gramInput);
       });
 
       div.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          openWeightPanel(div, input);
+          openWeightPanel(div, gramInput);
         }
       });
 
