@@ -83,33 +83,56 @@
 
     const menuDiv = document.getElementById("menu");
 
+    function addMenuItem(name, price) {
+      const div = document.createElement("div");
+      div.className = "menu-item";
+      div.innerHTML = `
+        <p class="item-name">${name}</p>
+        <span class="item-price">Rs. ${price}</span>
+      `;
+
+      menuDiv.appendChild(div);
+    }
+
     async function loadMenu() {
       try {
-        const querySnapshot = await getDocs(collection(db, "items"));
+        const itemsSnapshot = await getDocs(collection(db, "items"));
         menuDiv.classList.remove("message");
         menuDiv.innerHTML = "";
 
-        if (querySnapshot.empty) {
+        if (itemsSnapshot.empty) {
           menuDiv.classList.add("message");
           menuDiv.textContent = "No menu items found.";
           return;
         }
 
-        querySnapshot.forEach((doc) => {
-          const item = doc.data();
+        for (const itemDoc of itemsSnapshot.docs) {
+          const item = itemDoc.data();
           const menu = item.Menu || {};
-          const name = menu.gota || item.gota || item.name || "Unnamed item";
-          const price = menu.Price ?? item.Price ?? item.price ?? "N/A";
+          let foundSubcollectionMenu = false;
 
-          const div = document.createElement("div");
-          div.className = "menu-item";
-          div.innerHTML = `
-            <p class="item-name">${name}</p>
-            <span class="item-price">Rs. ${price}</span>
-          `;
+          const gokulSnapshot = await getDocs(collection(db, "items", itemDoc.id, "gokul"));
 
-          menuDiv.appendChild(div);
-        });
+          gokulSnapshot.forEach((gokulDoc) => {
+            const gokulMenu = gokulDoc.data();
+
+            Object.entries(gokulMenu).forEach(([name, price]) => {
+              foundSubcollectionMenu = true;
+              addMenuItem(name, price);
+            });
+          });
+
+          if (!foundSubcollectionMenu && (menu.gota || item.gota || item.name)) {
+            const name = menu.gota || item.gota || item.name || "Unnamed item";
+            const price = menu.Price ?? item.Price ?? item.price ?? "N/A";
+            addMenuItem(name, price);
+          }
+        }
+
+        if (!menuDiv.children.length) {
+          menuDiv.classList.add("message");
+          menuDiv.textContent = "No menu items found.";
+        }
       } catch (error) {
         console.error("Error loading menu:", error);
         menuDiv.classList.add("message");
