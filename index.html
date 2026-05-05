@@ -70,7 +70,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collectionGroup, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCbzeNkTSsNaC5Yhb5oUy86W2uURK_K7Rk",
@@ -86,61 +86,48 @@
     function addMenuItem(name, price) {
       const div = document.createElement("div");
       div.className = "menu-item";
-      div.innerHTML = `
-        <p class="item-name">${name}</p>
-        <span class="item-price">Rs. ${price}</span>
-      `;
+
+      const itemName = document.createElement("p");
+      itemName.className = "item-name";
+      itemName.textContent = name;
+
+      const itemPrice = document.createElement("span");
+      itemPrice.className = "item-price";
+      itemPrice.textContent = `Rs. ${price}`;
+
+      div.appendChild(itemName);
+      div.appendChild(itemPrice);
 
       menuDiv.appendChild(div);
     }
 
-    async function loadMenu() {
-      try {
-        const itemsSnapshot = await getDocs(collection(db, "items"));
-        menuDiv.classList.remove("message");
-        menuDiv.innerHTML = "";
+    function renderMenu(snapshot) {
+      menuDiv.classList.remove("message");
+      menuDiv.innerHTML = "";
 
-        if (itemsSnapshot.empty) {
-          menuDiv.classList.add("message");
-          menuDiv.textContent = "No menu items found.";
-          return;
-        }
+      snapshot.forEach((doc) => {
+        const menuItems = doc.data();
 
-        for (const itemDoc of itemsSnapshot.docs) {
-          const item = itemDoc.data();
-          const menu = item.Menu || {};
-          let foundSubcollectionMenu = false;
-
-          const gokulSnapshot = await getDocs(collection(db, "items", itemDoc.id, "gokul"));
-
-          gokulSnapshot.forEach((gokulDoc) => {
-            const gokulMenu = gokulDoc.data();
-
-            Object.entries(gokulMenu).forEach(([name, price]) => {
-              foundSubcollectionMenu = true;
-              addMenuItem(name, price);
-            });
-          });
-
-          if (!foundSubcollectionMenu && (menu.gota || item.gota || item.name)) {
-            const name = menu.gota || item.gota || item.name || "Unnamed item";
-            const price = menu.Price ?? item.Price ?? item.price ?? "N/A";
+        Object.entries(menuItems).forEach(([name, price]) => {
+          if (price !== null && price !== undefined && price !== "") {
             addMenuItem(name, price);
           }
-        }
+        });
+      });
 
-        if (!menuDiv.children.length) {
-          menuDiv.classList.add("message");
-          menuDiv.textContent = "No menu items found.";
-        }
-      } catch (error) {
-        console.error("Error loading menu:", error);
+      if (!menuDiv.children.length) {
         menuDiv.classList.add("message");
-        menuDiv.textContent = "Could not load menu. Please check Firestore rules and collection name.";
+        menuDiv.textContent = "No menu items found.";
       }
     }
 
-    loadMenu();
+    function showError(error) {
+      console.error("Error loading menu:", error);
+      menuDiv.classList.add("message");
+      menuDiv.textContent = "Could not load menu. Please check Firestore rules and collection name.";
+    }
+
+    onSnapshot(collectionGroup(db, "gokul"), renderMenu, showError);
   </script>
 </body>
 </html>
